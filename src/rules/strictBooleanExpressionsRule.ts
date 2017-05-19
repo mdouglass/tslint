@@ -309,15 +309,25 @@ function getKind(type: ts.Type): TypeKind {
         : is(ts.TypeFlags.Undefined | ts.TypeFlags.Void) ? TypeKind.Undefined // tslint:disable-line:no-bitwise
         : is(ts.TypeFlags.EnumLike) ? TypeKind.Enum
         : is(ts.TypeFlags.NumberLiteral) ?
-            ((type as ts.LiteralType).text === "0" ? TypeKind.FalseNumberLiteral : TypeKind.AlwaysTruthy)
+            (getLiteralTypeValue(type) === "0" ? TypeKind.FalseNumberLiteral : TypeKind.AlwaysTruthy)
         : is(ts.TypeFlags.StringLiteral) ?
-            ((type as ts.LiteralType).text === "" ? TypeKind.FalseStringLiteral : TypeKind.AlwaysTruthy)
+            (getLiteralTypeValue(type) === "" ? TypeKind.FalseStringLiteral : TypeKind.AlwaysTruthy)
         : is(ts.TypeFlags.BooleanLiteral) ?
             ((type as ts.IntrinsicType).intrinsicName === "true" ? TypeKind.AlwaysTruthy : TypeKind.FalseBooleanLiteral)
         : TypeKind.AlwaysTruthy;
 
     function is(flags: ts.TypeFlags) {
         return Lint.isTypeFlagSet(type, flags);
+    }
+
+    // TODO: remove this function when 2.3 is no longer supported
+    function getLiteralTypeValue(literalTypeValue: ts.Type) {
+        // TypeScript 2.4 uses .value
+        if ((literalTypeValue as any).value !== undefined) {
+            return (literalTypeValue as any).value;
+        }
+        // TypeScript 2.3 uses .text
+        return (literalTypeValue as ts.LiteralType).text;
     }
 }
 
