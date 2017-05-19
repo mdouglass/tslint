@@ -309,7 +309,7 @@ function getKind(type: ts.Type): TypeKind {
         : is(ts.TypeFlags.Undefined | ts.TypeFlags.Void) ? TypeKind.Undefined // tslint:disable-line:no-bitwise
         : is(ts.TypeFlags.EnumLike) ? TypeKind.Enum
         : is(ts.TypeFlags.NumberLiteral) ?
-            (getLiteralTypeValue(type) === "0" ? TypeKind.FalseNumberLiteral : TypeKind.AlwaysTruthy)
+            (getLiteralTypeValue(type) === "0" || getLiteralTypeValue(type) === 0 ? TypeKind.FalseNumberLiteral : TypeKind.AlwaysTruthy)
         : is(ts.TypeFlags.StringLiteral) ?
             (getLiteralTypeValue(type) === "" ? TypeKind.FalseStringLiteral : TypeKind.AlwaysTruthy)
         : is(ts.TypeFlags.BooleanLiteral) ?
