@@ -323,9 +323,11 @@ function getKind(type: ts.Type): TypeKind {
     // TODO: remove this function when 2.3 is no longer supported
     function getLiteralTypeValue(literalTypeValue: ts.Type) {
         // TypeScript 2.4 uses .value
+        // tslint:disable no-unsafe-any
         if ((literalTypeValue as any).value !== undefined) {
             return (literalTypeValue as any).value;
         }
+        // tslint-enable no-unsafe-any
         // TypeScript 2.3 uses .text
         return (literalTypeValue as ts.LiteralType).text;
     }
