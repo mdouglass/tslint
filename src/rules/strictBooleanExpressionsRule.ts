@@ -309,7 +309,7 @@ function getKind(type: ts.Type): TypeKind {
         : is(ts.TypeFlags.Undefined | ts.TypeFlags.Void) ? TypeKind.Undefined // tslint:disable-line:no-bitwise
         : is(ts.TypeFlags.EnumLike) ? TypeKind.Enum
         : is(ts.TypeFlags.NumberLiteral) ?
-            (getLiteralTypeValue(type) === "0" || getLiteralTypeValue(type) === 0 ? TypeKind.FalseNumberLiteral : TypeKind.AlwaysTruthy)
+            (getLiteralTypeValue(type) === 0 ? TypeKind.FalseNumberLiteral : TypeKind.AlwaysTruthy)
         : is(ts.TypeFlags.StringLiteral) ?
             (getLiteralTypeValue(type) === "" ? TypeKind.FalseStringLiteral : TypeKind.AlwaysTruthy)
         : is(ts.TypeFlags.BooleanLiteral) ?
@@ -320,7 +320,7 @@ function getKind(type: ts.Type): TypeKind {
         return Lint.isTypeFlagSet(type, flags);
     }
 
-    // TODO: remove this function when 2.3 is no longer supported
+    // TODO: remove this function when 2.3 is no longer supported and replace with `(type as ts.LiteralType).value`
     function getLiteralTypeValue(literalTypeValue: ts.Type) {
         // TypeScript 2.4 uses .value
         // tslint:disable no-unsafe-any
@@ -329,7 +329,11 @@ function getKind(type: ts.Type): TypeKind {
         }
         // tslint-enable no-unsafe-any
         // TypeScript 2.3 uses .text
-        return (literalTypeValue as ts.LiteralType).text;
+        const text = (literalTypeValue as ts.LiteralType).text;
+        if (is(ts.TypeFlags.NumberLiteral)) {
+            return parseFloat(text);
+        }
+        return text;
     }
 }
 
